@@ -1,5 +1,5 @@
 from rest_framework import routers
-from .views import BookViewSet, AuthorViewSet, ProduitViewSet, FournisseurViewSet, ClientViewSet, CategorieViewSet, MouvementViewSet
+from .views import BookViewSet, AuthorViewSet, ProduitViewSet, FournisseurViewSet, ClientViewSet, CategorieViewSet, MouvementViewSet, CommandeViewSet
 
 router = routers.DefaultRouter()
 router.register('books', BookViewSet)
@@ -12,3 +12,4 @@ router.register('fournisseurs', FournisseurViewSet)
 router.register('clients', ClientViewSet)
 router.register('mouvements', MouvementViewSet)
 router.register('categories', CategorieViewSet)
+router.register('commandes', CommandeViewSet)

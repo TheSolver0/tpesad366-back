@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import Book, Author, Produit,Fournisseur,Client,Categorie,Mouvement
-from .serializers import BookSerializer, AuthorSerializer, ProduitSerializer, FournisseurSerializer, ClientSerializer, CategorieSerializer, MouvementSerializer
+from .models import Book, Author, Produit,Fournisseur,Client,Categorie,Mouvement,Commande
+from .serializers import BookSerializer, AuthorSerializer, ProduitSerializer, FournisseurSerializer, ClientSerializer, CategorieSerializer, MouvementSerializer, CommandeSerializer
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
@@ -34,4 +34,8 @@ class CategorieViewSet(viewsets.ModelViewSet):
 class MouvementViewSet(viewsets.ModelViewSet):
     queryset = Mouvement.objects.all()
     serializer_class = MouvementSerializer
+    
+class CommandeViewSet(viewsets.ModelViewSet):
+    queryset = Commande.objects.all()
+    serializer_class = CommandeSerializer
     
