@@ -35,9 +35,16 @@ class CategorieSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MouvementSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     class Meta:
         model = Mouvement
-        fields = '__all__'
+        fields = ['id', 'type', 'qte', 'montant', 'produits', 'user', 'created_at']
+    def get_user(self, obj):
+        if obj.userC:
+            return ClientSerializer(obj.userC).data
+        elif obj.userF:
+            return FournisseurSerializer(obj.userF).data
+        return None
 
 class CommandeSerializer(serializers.ModelSerializer):
     produits = serializers.PrimaryKeyRelatedField(queryset=Produit.objects.all())

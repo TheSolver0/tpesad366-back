@@ -27,7 +27,7 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=32, unique=True)
     quantity = models.IntegerField(default=1)
-    author = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -49,7 +49,7 @@ class Categorie(TimeStampedModel):
 class Produit(TimeStampedModel):
     nom = models.CharField(max_length=255)
     desc = models.CharField(max_length=255)
-    categ = models.ForeignKey(Categorie, on_delete=models.DO_NOTHING)
+    categ = models.ForeignKey(Categorie, on_delete=models.CASCADE)
     qte = models.IntegerField()
     pu = models.FloatField()
     seuil = models.IntegerField()
@@ -81,9 +81,10 @@ class Client(TimeStampedModel):
 class Mouvement(TimeStampedModel):
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
     qte = models.IntegerField()
-    userF = models.ForeignKey(Fournisseur, on_delete=models.DO_NOTHING, null=True, blank=True)
-    userC = models.ForeignKey(Client, on_delete=models.DO_NOTHING, null=True, blank=True)
+    userF = models.ForeignKey(Fournisseur, on_delete=models.CASCADE, null=True, blank=True)
+    userC = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     montant = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    produits =  models.ForeignKey(Produit, on_delete=models.SET_NULL, null=True, blank=True)
 
     def clean(self):
         if self.userC and self.userF:
@@ -107,10 +108,10 @@ class Mouvement(TimeStampedModel):
         return f"{self.type} - {self.qte}"
 
 class Commande(TimeStampedModel):
-    produits =  models.ForeignKey(Produit, on_delete=models.DO_NOTHING)
+    produits =  models.ForeignKey(Produit, on_delete=models.CASCADE)
     qte = models.IntegerField()
-    userF = models.ForeignKey(Fournisseur, on_delete=models.DO_NOTHING, null=True, blank=True)
-    userC = models.ForeignKey(Client, on_delete=models.DO_NOTHING, null=True, blank=True)
+    userF = models.ForeignKey(Fournisseur, on_delete=models.CASCADE, null=True, blank=True)
+    userC = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     statut = models.CharField(max_length=30, choices=STATUT_CHOICES, default='EN_ATTENTE' )
     montant = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
