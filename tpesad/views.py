@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import Book, Author, Produit,Fournisseur,Client,Categorie,Mouvement,Commande
-from .serializers import BookSerializer, AuthorSerializer, ProduitSerializer, FournisseurSerializer, ClientSerializer, CategorieSerializer, MouvementSerializer, CommandeSerializer
+from .models import Book, Author, Produit,UserTPE,Categorie,Mouvement,CommandeClient,CommandeFournisseur
+from .serializers import BookSerializer, AuthorSerializer, ProduitSerializer,UserTPESerializer,CategorieSerializer, MouvementSerializer, CommandeFournisseurSerializer, CommandeClientSerializer
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
@@ -19,13 +19,16 @@ class ProduitViewSet(viewsets.ModelViewSet):
     queryset = Produit.objects.all()
     serializer_class = ProduitSerializer
 
-class FournisseurViewSet(viewsets.ModelViewSet):
-    queryset = Fournisseur.objects.all()
-    serializer_class = FournisseurSerializer
-
+class UserTPEViewSet(viewsets.ModelViewSet):
+    queryset = UserTPE.objects.all()
+    serializer_class = UserTPESerializer
 class ClientViewSet(viewsets.ModelViewSet):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
+    queryset = UserTPE.objects.filter(role='CLIENT')
+    serializer_class = UserTPESerializer
+
+class FournisseurViewSet(viewsets.ModelViewSet):
+    queryset = UserTPE.objects.filter(role='FOURNISSEUR')
+    serializer_class = UserTPESerializer
 
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
@@ -35,7 +38,11 @@ class MouvementViewSet(viewsets.ModelViewSet):
     queryset = Mouvement.objects.all()
     serializer_class = MouvementSerializer
     
-class CommandeViewSet(viewsets.ModelViewSet):
-    queryset = Commande.objects.all()
-    serializer_class = CommandeSerializer
+class CommandeClientViewSet(viewsets.ModelViewSet):
+    queryset = CommandeClient.objects.all()
+    serializer_class = CommandeClientSerializer
+
+class CommandeFournisseurViewSet(viewsets.ModelViewSet):
+    queryset = CommandeFournisseur.objects.all()
+    serializer_class = CommandeFournisseurSerializer
     

@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Book,Author,Produit,Fournisseur,Client,Categorie,Mouvement,Commande
-
+from .models import Book,Author,Produit,Categorie,Mouvement,CommandeClient, CommandeFournisseur,UserTPE
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
@@ -19,15 +18,12 @@ class ProduitSerializer(serializers.ModelSerializer):
         model = Produit
         fields = '__all__'
 
-class FournisseurSerializer(serializers.ModelSerializer):
+class UserTPESerializer(serializers.ModelSerializer):
+    produits_details = ProduitSerializer(source='produits', many=True, read_only=True)
     class Meta:
-        model = Fournisseur
+        model = UserTPE
         fields = '__all__'
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = '__all__'
 
 class CategorieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,42 +31,36 @@ class CategorieSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MouvementSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Mouvement
-        fields = ['id', 'type', 'qte', 'montant', 'produits', 'user', 'created_at']
-    def get_user(self, obj):
-        if obj.userC:
-            return ClientSerializer(obj.userC).data
-        elif obj.userF:
-            return FournisseurSerializer(obj.userF).data
-        return None
+        fields = '__all__'
 
-class CommandeSerializer(serializers.ModelSerializer):
-    produits = serializers.PrimaryKeyRelatedField(queryset=Produit.objects.all())
+
+
+class CommandeBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ['id', 'produits', 'qte', 'statut', 'montant']
+        read_only_fields = ['montant']
+class CommandeClientSerializer(CommandeBaseSerializer):
+    client = serializers.PrimaryKeyRelatedField(queryset=UserTPE.objects.filter(role='CLIENT'))
+    produit_nom = serializers.CharField(source='produits.nom', read_only=True)
+    produit_pu = serializers.CharField(source='produits.pu', read_only=True)
+    client_nom = serializers.CharField(source='client.nom', read_only=True)
     produits_details = ProduitSerializer(source='produits', read_only=True)
 
-    userF = serializers.PrimaryKeyRelatedField(queryset=Fournisseur.objects.all(), required=False, allow_null=True)
-    userF_details = FournisseurSerializer(source='userF', read_only=True)
+    class Meta(CommandeBaseSerializer.Meta):
+        model = CommandeClient
+        fields = CommandeBaseSerializer.Meta.fields + ['client', 'produit_nom', 'client_nom', 'produit_pu', 'produits_details']
 
-    userC = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all(), required=False, allow_null=True)
-    userC_details = ClientSerializer(source='userC', read_only=True)
+class CommandeFournisseurSerializer(CommandeBaseSerializer):
+    fournisseur = serializers.PrimaryKeyRelatedField(queryset=UserTPE.objects.filter(role='FOURNISSEUR'))
+    produit_nom = serializers.CharField(source='produits.nom', read_only=True)
+    produit_pu = serializers.CharField(source='produits.pu', read_only=True)
+    fournisseur_nom = serializers.CharField(source='fournisseur.nom', read_only=True)
+    produits_details = ProduitSerializer(source='produits', read_only=True)
 
-    type_commande = serializers.SerializerMethodField()
+    class Meta(CommandeBaseSerializer.Meta):
+        model = CommandeFournisseur
+        fields = CommandeBaseSerializer.Meta.fields + ['fournisseur', 'produit_nom', 'fournisseur_nom', 'produit_pu', 'produits_details']
 
-    class Meta:
-        model = Commande
-        fields = [
-            'id',
-            'produits', 'produits_details',
-            'qte',
-            'userF', 'userF_details',
-            'userC', 'userC_details',
-            'statut',
-            'type_commande',
-            'montant',
-        ]
-        read_only_fields = ['montant']
-
-    def get_type_commande(self, obj):
-        return obj.type_commande
