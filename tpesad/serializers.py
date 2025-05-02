@@ -31,6 +31,7 @@ class CategorieSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MouvementSerializer(serializers.ModelSerializer):
+    user_details = UserTPESerializer(source='user', read_only=True)
 
     class Meta:
         model = Mouvement
@@ -57,10 +58,10 @@ class CommandeFournisseurSerializer(CommandeBaseSerializer):
     fournisseur = serializers.PrimaryKeyRelatedField(queryset=UserTPE.objects.filter(role='FOURNISSEUR'))
     produit_nom = serializers.CharField(source='produits.nom', read_only=True)
     produit_pu = serializers.CharField(source='produits.pu', read_only=True)
-    fournisseur_nom = serializers.CharField(source='fournisseur.nom', read_only=True)
+    fournisseur_details = UserTPESerializer(source='fournisseur', read_only=True)
     produits_details = ProduitSerializer(source='produits', read_only=True)
 
     class Meta(CommandeBaseSerializer.Meta):
         model = CommandeFournisseur
-        fields = CommandeBaseSerializer.Meta.fields + ['fournisseur', 'produit_nom', 'fournisseur_nom', 'produit_pu', 'produits_details']
+        fields = CommandeBaseSerializer.Meta.fields + ['fournisseur', 'produit_nom', 'fournisseur_details', 'produit_pu', 'produits_details']
 
