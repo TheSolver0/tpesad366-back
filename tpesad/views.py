@@ -64,7 +64,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
     serializer_class = CategorieSerializer
 
 class MouvementViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Mouvement.objects.all()
     serializer_class = MouvementSerializer
     
