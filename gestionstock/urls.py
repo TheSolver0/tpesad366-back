@@ -24,5 +24,6 @@ router.registry.extend(tpesad_router.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path('', include(router.urls)),
 ]

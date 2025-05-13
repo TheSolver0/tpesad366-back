@@ -1,17 +1,35 @@
 from rest_framework import serializers
-from .models import Book,Author,Produit,Categorie,Mouvement,CommandeClient, CommandeFournisseur,UserTPE
-class BookSerializer(serializers.ModelSerializer):
+from django.contrib.auth import authenticate
+from .models import Produit,Categorie,Mouvement,CommandeClient, CommandeFournisseur,UserTPE, User
+
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Book
-        fields = '__all__'
+        model = User
+        fields = ['id', 'email', 'nom']
 
-class AuthorSerializer(serializers.ModelSerializer):
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        user = authenticate(email=data['email'], password=data['password'])
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Identifiants invalides")
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
-        model = Author
-        fields = '__all__'
+        model = User
+        fields = ['email', 'nom', 'password']
 
-#----------------------------------------------------------------------------------------------------------------------------------------
-
+    def create(self, validated_data):
+        return User.objects.create_user(
+            email=validated_data['email'],
+            nom=validated_data['nom'],
+            password=validated_data['password']
+        )
 class ProduitSerializer(serializers.ModelSerializer):
     categorie_nom = serializers.CharField(source='categ.libelle', read_only=True)
     class Meta:
