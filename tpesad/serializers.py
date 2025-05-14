@@ -6,7 +6,7 @@ from .models import Produit,Categorie,Mouvement,CommandeClient, CommandeFourniss
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'nom']
+        fields = ['id', 'email', 'nom', 'is_superuser']
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

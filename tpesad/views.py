@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken,TokenError
 from rest_framework.permissions import IsAuthenticated
-from .models import  Produit,UserTPE,Categorie,Mouvement,CommandeClient,CommandeFournisseur
+from .models import  Produit,UserTPE,Categorie,Mouvement,CommandeClient,CommandeFournisseur, User
 from .serializers import LoginSerializer,RegisterSerializer, UserSerializer, ProduitSerializer,UserTPESerializer,CategorieSerializer, MouvementSerializer, CommandeFournisseurSerializer, CommandeClientSerializer
 
 
@@ -39,27 +39,43 @@ class AuthViewSet(viewsets.ViewSet):
             return Response({'error': 'Token de rafraîchissement manquant'}, status=status.HTTP_400_BAD_REQUEST)
         except TokenError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['post'])
+    def refresh(self, request):
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({'detail': 'Le refresh token est requis.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            new_access = str(refresh.access_token)
+            return Response({'access': new_access}, status=status.HTTP_200_OK)
+        except TokenError as e:
+            return Response({'detail': 'Refresh token invalide ou expiré.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class= UserSerializer
 class ProduitViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Produit.objects.all()
     serializer_class = ProduitSerializer
 
 class UserTPEViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = UserTPE.objects.all()
     serializer_class = UserTPESerializer
 class ClientViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = UserTPE.objects.filter(role='CLIENT')
     serializer_class = UserTPESerializer
 
 class FournisseurViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = UserTPE.objects.filter(role='FOURNISSEUR')
     serializer_class = UserTPESerializer
 
 class CategorieViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
 
@@ -69,12 +85,12 @@ class MouvementViewSet(viewsets.ModelViewSet):
     serializer_class = MouvementSerializer
     
 class CommandeClientViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = CommandeClient.objects.all()
     serializer_class = CommandeClientSerializer
 
 class CommandeFournisseurViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = CommandeFournisseur.objects.all()
     serializer_class = CommandeFournisseurSerializer
     
